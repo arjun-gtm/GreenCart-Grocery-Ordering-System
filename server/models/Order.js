@@ -11,6 +11,7 @@ const orderSchema = new mongoose.Schema({
     status: {type: String, default: 'Processing'},
     paymentType: {type: String, required: true},
     isPaid: {type: Boolean, required: true, default: false},
+    refId: {type: String},
 },{ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } })
 
 orderSchema.virtual('user', {
