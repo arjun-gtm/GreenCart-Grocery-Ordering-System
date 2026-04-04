@@ -44,6 +44,7 @@ export const AppContextProvider = ({children})=>{
     }, []);
 
     const [isSeller, setIsSeller] = useState(false)
+    const [adminRole, setAdminRole] = useState(null)
     const [products, setProducts] = useState([])
     const [categories, setCategories] = useState(defaultCategories)
 
@@ -70,11 +71,14 @@ export const AppContextProvider = ({children})=>{
             const {data} = await api.get('/api/seller/is-auth');
             if(data.success){
                 setIsSeller(true)
+                setAdminRole(data.role)
             }else{
                 setIsSeller(false)
+                setAdminRole(null)
             }
         } catch (error) {
             setIsSeller(false)
+            setAdminRole(null)
         }
     }
 
@@ -210,7 +214,7 @@ const getCartAmount = () =>{
     },[cartItems, isLoaded, isSignedIn])
 
     const value = {
-        navigate, user, isSignedIn, isLoaded, setIsSeller, isSeller,
+        navigate, user, isSignedIn, isLoaded, setIsSeller, isSeller, adminRole, setAdminRole,
         products, categories, currency, addToCart, updateCartItem, removeFromCart, cartItems, 
         searchQuery, setSearchQuery, getCartAmount, getCartCount, axios: api, fetchProducts, fetchCategories, setCartItems
     }

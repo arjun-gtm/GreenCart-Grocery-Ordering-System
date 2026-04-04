@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
+import Admin from '../models/Admin.js';
 
 // Login Seller : /api/seller/login
 
@@ -9,8 +11,8 @@ export const sellerLogin = async (req, res) =>{
     try {
         const { email, password } = req.body;
 
-        if(password === process.env.SELLER_PASSWORD && email === process.env.SELLER_EMAIL){
-            const token = jwt.sign({email}, process.env.JWT_SECRET, {expiresIn: '7d'});
+        if (email === process.env.SUPER_ADMIN_EMAIL && password === process.env.SUPER_ADMIN_PASSWORD) {
+            const token = jwt.sign({ email, role: 'superadmin' }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
             res.cookie('sellerToken', token, {
                 httpOnly: true, 
@@ -19,10 +21,26 @@ export const sellerLogin = async (req, res) =>{
                 maxAge: 7 * 24 * 60 * 60 * 1000,
             });
 
-            return res.json({ success: true, message: "Logged In" });
-        }else{
-            return res.json({ success: false, message: "Invalid Credentials" });
+            return res.json({ success: true, message: "Logged In as Super Admin", role: 'superadmin' });
         }
+
+        const admin = await Admin.findOne({ email });
+        if (admin) {
+            const isMatch = await bcrypt.compare(password, admin.password);
+            if (isMatch) {
+                const token = jwt.sign({ email: admin.email, role: 'admin', id: admin._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+                res.cookie('sellerToken', token, {
+                    httpOnly: true, 
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+                    maxAge: 7 * 24 * 60 * 60 * 1000,
+                });
+                return res.json({ success: true, message: "Logged In as Admin", role: 'admin' });
+            }
+        }
+
+        return res.json({ success: false, message: "Invalid Credentials" });
     } catch (error) {
         console.log(error.message);
         res.json({ success: false, message: error.message });
@@ -43,9 +61,78 @@ export const getUsersCount = async (req, res)=>{
 // Seller isAuth : /api/seller/is-auth
 export const isSellerAuth = async (req, res)=>{
     try {
-        return res.json({success: true})
+        return res.json({success: true, role: req.sellerRole})
     } catch (error) {
         console.log(error.message);
+        res.json({ success: false, message: error.message });
+    }
+}
+
+// Admin Management Features
+export const addAdmin = async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+        
+        const existingAdmin = await Admin.findOne({ email });
+        if (existingAdmin || email === process.env.SUPER_ADMIN_EMAIL) {
+            return res.json({ success: false, message: "Admin with this email already exists" });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newAdmin = new Admin({ name, email, password: hashedPassword });
+        await newAdmin.save();
+
+        res.json({ success: true, message: "Admin created successfully", admin: { _id: newAdmin._id, name, email } });
+    } catch (error) {
+         res.json({ success: false, message: error.message });
+    }
+}
+
+export const getAdmins = async (req, res) => {
+    try {
+        const admins = await Admin.find({}).select("-password");
+        res.json({ success: true, admins });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
+
+export const updateAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, email, password } = req.body;
+
+        const admin = await Admin.findById(id);
+        if(!admin) return res.json({success: false, message: "Admin not found"});
+
+        if (email && email !== admin.email) {
+            const existingAdmin = await Admin.findOne({ email });
+            if (existingAdmin || email === process.env.SUPER_ADMIN_EMAIL) {
+                return res.json({ success: false, message: "Email is already in use" });
+            }
+        }
+
+        admin.name = name || admin.name;
+        admin.email = email || admin.email;
+        if(password) {
+             const salt = await bcrypt.genSalt(10);
+             admin.password = await bcrypt.hash(password, salt);
+        }
+        await admin.save();
+        res.json({ success: true, message: "Admin updated successfully" });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
+
+export const deleteAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await Admin.findByIdAndDelete(id);
+        res.json({ success: true, message: "Admin deleted successfully" });
+    } catch (error) {
         res.json({ success: false, message: error.message });
     }
 }

@@ -3,11 +3,11 @@ import { assets } from "../../assets/assets";
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
 import { useState } from "react";
-import { MdDashboard, MdAddBox, MdListAlt, MdShoppingCart, MdApps } from "react-icons/md";
+import { MdDashboard, MdAddBox, MdListAlt, MdShoppingCart, MdApps, MdAdminPanelSettings } from "react-icons/md";
 
 const SellerLayout = () => {
 
-    const { axios, navigate } = useAppContext();
+    const { axios, navigate, adminRole, setAdminRole, setIsSeller } = useAppContext();
     const [logoutConfirm, setLogoutConfirm] = useState(false);
 
 
@@ -17,6 +17,7 @@ const SellerLayout = () => {
         { name: "Product List", path: "/seller/product-list", icon: MdListAlt, isIcon: true },
         { name: "Categories", path: "/seller/category-list", icon: MdApps, isIcon: true },
         { name: "Orders", path: "/seller/orders", icon: MdShoppingCart, isIcon: true },
+        ...(adminRole === 'superadmin' ? [{ name: "Admins", path: "/seller/admins", icon: MdAdminPanelSettings, isIcon: true }] : []),
     ];
 
     const handleLogoutClick = () => {
@@ -29,6 +30,8 @@ const SellerLayout = () => {
             if(data.success){
                 toast.success(data.message)
                 setLogoutConfirm(false);
+                setIsSeller(false)
+                setAdminRole(null)
                 navigate('/')
             }else{
                 toast.error(data.message)
@@ -49,7 +52,10 @@ const SellerLayout = () => {
                     <img src={assets.logo} alt="log" className="cursor-pointer w-34 md:w-38" />
                 </Link>
                 <div className="flex items-center gap-5 text-gray-500">
-                    <p>Hi! Admin</p>
+                    <div className="flex flex-col items-end">
+                        <p className="text-xs font-bold uppercase text-primary tracking-tighter leading-none">{adminRole === 'superadmin' ? 'Super Admin' : 'Admin'}</p>
+                        <p className="text-sm font-medium">Hi! Welcome</p>
+                    </div>
                     <button onClick={handleLogoutClick} className='border rounded-full text-sm px-4 py-1 cursor-pointer hover:bg-gray-100 transition'>Logout</button>
                 </div>
             </div>

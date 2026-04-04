@@ -19,6 +19,7 @@ import AddCategory from './pages/seller/AddCategory';
 import CategoryList from './pages/seller/CategoryList';
 import ProductList from './pages/seller/ProductList';
 import Orders from './pages/seller/Orders';
+import AdminManagement from './pages/seller/AdminManagement';
 import Loading from './components/Loading';
 import Contact from './pages/Contact';
 import { Show, RedirectToSignIn } from '@clerk/react'
@@ -80,6 +81,7 @@ const App = () => {
             <Route path='add-category' element={<AddCategory/>} />
             <Route path='edit-category/:categoryId' element={<AddCategory/>} />
             <Route path='orders' element={<Orders/>} />
+            <Route path='admins' element={<AdminManagement/>} />
           </Route>
         </Routes>
       </div>

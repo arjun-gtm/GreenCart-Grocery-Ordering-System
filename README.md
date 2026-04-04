@@ -21,6 +21,12 @@ GreenCart is a premium, high-performance grocery e-commerce solution built with 
 - **Automated Calculations**: Dynamic cart sums with automated 2% tax calculation and free shipping thresholds.
 
 ### 👨‍💼 Seller / Admin Dashboard
+- **Role-Based Access Control (RBAC)**: 
+    - **Super Admin**: Full system control including managing other administrators.
+    - **Admin**: Access to products, categories, orders, and analytics without administrative management rights.
+- **Admin Management (Super Admin only)**:
+    - Dedicated interface to **Add, Edit, and Delete** secondary administrators.
+    - Secure password hashing for all administrative accounts.
 - **Analytics Overview**:
     - **Advanced Reporting**: Instantly export full dashboard sales reports to high-quality **PDF** documents or **Excel** spreadsheets!
     - **Revenue Tracking**: Differentiates between "Confirmed Revenue" (Paid) and "On Hold" (Unpaid COD).
@@ -93,8 +99,8 @@ greencart/
    CLOUDINARY_API_SECRET=your_api_secret
    KHALTI_PUBLIC_KEY=your_khalti_public_key
    KHALTI_SECRET_KEY=your_khalti_secret_key
-   SELLER_EMAIL=admin@greencart.com
-   SELLER_PASSWORD=your_dashboard_password
+   SUPER_ADMIN_EMAIL=superadmin@greencart.com
+   SUPER_ADMIN_PASSWORD=superadmin
    ```
 3. Install dependencies: `npm install`
 4. Start the server: `npm run server`

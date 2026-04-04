@@ -3,7 +3,7 @@ import { useAppContext } from '../../context/AppContext'
 import toast from 'react-hot-toast';
 
 const SellerLogin = () => {
-    const {isSeller, setIsSeller, navigate, axios} = useAppContext()
+    const {isSeller, setIsSeller, navigate, axios, setAdminRole} = useAppContext()
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -13,6 +13,7 @@ const SellerLogin = () => {
             const {data} = await axios.post('/api/seller/login', {email, password})
             if(data.success){
                 setIsSeller(true)
+                setAdminRole(data.role)
                 navigate('/seller')
             }else{
                 toast.error(data.message)

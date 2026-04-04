@@ -2,6 +2,8 @@ import express from 'express';
 import { isSellerAuth, sellerLogin, sellerLogout, getUsersCount, getSellerAnalytics } from '../controllers/sellerController.js';
 import { exportOrdersPDF, exportOrdersExcel, exportProductsExcel, exportCategoriesExcel, exportFullReportPDF, exportFullReportExcel } from '../controllers/reportController.js';
 import authSeller from '../middlewares/authSeller.js';
+import authSuperAdmin from '../middlewares/authSuperAdmin.js';
+import { addAdmin, getAdmins, updateAdmin, deleteAdmin } from '../controllers/sellerController.js';
 
 const sellerRouter = express.Router();
 
@@ -10,6 +12,12 @@ sellerRouter.get('/is-auth', authSeller, isSellerAuth);
 sellerRouter.get('/logout', sellerLogout);
 sellerRouter.get('/users-count', authSeller, getUsersCount);
 sellerRouter.get('/analytics', authSeller, getSellerAnalytics);
+
+// Admin Management (Super Admin Only)
+sellerRouter.post('/admin', authSuperAdmin, addAdmin);
+sellerRouter.get('/admin', authSuperAdmin, getAdmins);
+sellerRouter.put('/admin/:id', authSuperAdmin, updateAdmin);
+sellerRouter.delete('/admin/:id', authSuperAdmin, deleteAdmin);
 
 // Report Routes
 sellerRouter.get('/export/orders/pdf', authSeller, exportOrdersPDF);
