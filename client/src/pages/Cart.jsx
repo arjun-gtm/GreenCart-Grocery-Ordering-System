@@ -10,7 +10,6 @@ const Cart = () => {
     const [showAddress, setShowAddress] = useState(false)
     const [selectedAddress, setSelectedAddress] = useState(null)
     const [paymentOption, setPaymentOption] = useState("COD")
-
     const getCart = ()=>{
         let tempArray = []
         for(const key in cartItems){
@@ -60,15 +59,24 @@ const Cart = () => {
                     toast.error(data.message)
                 }
             }else{
-                // Place Order with Stripe
-                const {data} = await axios.post('/api/order/stripe', {
+                // Place Order with Online (Khalti)
+                const {data} = await axios.post('/api/order/online', {
                     userId: user.id,
                     items: cartArray.map(item=> ({product: item._id, quantity: item.quantity})),
                     address: selectedAddress._id
                 })
 
                 if(data.success){
-                    window.location.replace(data.url)
+                    const orderId = data.orderId;
+                    
+                    sessionStorage.setItem("currentOrderId", orderId);
+                    const khaltiRes = await axios.post('/api/payment/khalti-initiate', { orderId });
+                    
+                    if (khaltiRes.data.success) {
+                        window.location.href = khaltiRes.data.paymentUrl;
+                    } else {
+                        toast.error(khaltiRes.data.message || "Khalti initialization failed");
+                    }
                 }else{
                     toast.error(data.message)
                 }

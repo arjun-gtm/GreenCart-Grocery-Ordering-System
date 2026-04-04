@@ -22,6 +22,8 @@ import Orders from './pages/seller/Orders';
 import Loading from './components/Loading';
 import Contact from './pages/Contact';
 import { Show, RedirectToSignIn } from '@clerk/react'
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentFailure from './pages/PaymentFailure';
 
 const App = () => {
 
@@ -65,6 +67,8 @@ const App = () => {
 
           <Route path='/contact' element={<Contact/>} />
           <Route path='/loader' element={<Loading/>} />
+          <Route path='/payment-success' element={<PaymentSuccess/>} />
+          <Route path='/payment-failure' element={<PaymentFailure/>} />
           
           <Route path='/seller' element={isSeller ? <SellerLayout/> : <SellerLogin/>}>
             <Route index element={isSeller ? <Dashboard/> : null} />
