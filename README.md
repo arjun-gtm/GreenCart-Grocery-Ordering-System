@@ -116,4 +116,4 @@ greencart/
 - **Idempotency Execution**: Prevents double-charging or erroneous dual inventory execution on server restarts.
 
 ---
-Created by Antigravity AI - Empowering modern web applications.
+Created Arjun Gautam.
