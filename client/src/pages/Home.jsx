@@ -4,6 +4,7 @@ import Categories from '../components/Categories'
 import BestSeller from '../components/BestSeller'
 import BottomBanner from '../components/BottomBanner'
 import NewsLetter from '../components/NewsLetter'
+import RecommendedProducts from '../components/RecommendedProducts'
 import { useAppContext } from '../context/AppContext'
 
 const Home = () => {
@@ -18,6 +19,7 @@ const Home = () => {
         <p className='text-center text-red-500 mt-8'>No categories found. Please add some via the seller panel.</p>
       )}
       <BestSeller />
+      <RecommendedProducts />
       <BottomBanner/>
       <NewsLetter />
     </div>

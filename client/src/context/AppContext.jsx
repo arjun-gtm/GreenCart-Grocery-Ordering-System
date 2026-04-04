@@ -48,7 +48,7 @@ export const AppContextProvider = ({children})=>{
     const [categories, setCategories] = useState(defaultCategories)
 
     const [cartItems, setCartItems] = useState({})
-    const [searchQuery, setSearchQuery] = useState({})
+    const [searchQuery, setSearchQuery] = useState("")
 
     // Fetch User Cart Items from Backend using Clerk Token
     const fetchUserData = async () => {

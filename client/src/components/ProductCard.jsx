@@ -3,15 +3,30 @@ import { assets } from "../assets/assets";
 import { useAppContext } from "../context/AppContext";
 
 
-const ProductCard = ({product}) => {
+const ProductCard = ({product, highlight}) => {
     const {currency, addToCart, removeFromCart, cartItems, navigate} = useAppContext()
 
     const available = product.inStock !== false && (product.stock === undefined || product.stock > 0)
 
+    const highlightText = (text, keyword) => {
+        if (!keyword || !keyword.trim()) return text;
+        const regex = new RegExp(`(${keyword})`, "gi");
+        const parts = text.split(regex);
+        return (
+            <>
+                {parts.map((part, i) => 
+                    part.toLowerCase() === keyword.toLowerCase() 
+                        ? <b key={i} className="text-primary">{part}</b> 
+                        : part
+                )}
+            </>
+        );
+    };
+
     return product && (
         <div
             onClick={()=> {navigate(`/products/${product.category.toLowerCase()}/${product._id}`); scrollTo(0,0)}}
-            className={`border border-gray-500/20 rounded-md md:px-4 px-3 py-2 bg-white min-w-56 max-w-56 w-full ${!available ? "opacity-90" : ""}`}
+            className={`border border-gray-500/20 rounded-md md:px-4 px-3 py-2 bg-white w-full h-full max-w-sm mx-auto flex flex-col justify-between ${!available ? "opacity-90" : ""}`}
         >
             <div className="group cursor-pointer flex items-center justify-center px-2 relative">
                 {!available && (
@@ -23,7 +38,9 @@ const ProductCard = ({product}) => {
             </div>
             <div className="text-gray-500/60 text-sm">
                 <p>{product.category}</p>
-                <p className="text-gray-700 font-medium text-lg truncate w-full">{product.name}</p>
+                <p className="text-gray-700 font-medium text-lg truncate w-full">
+                    {highlight ? highlightText(product.name, highlight) : product.name}
+                </p>
                 <div className="flex items-center gap-0.5">
                     {Array(5).fill('').map((_, i) => (
                            <img key={i} className="md:w-3.5 w3" src={i < 4 ? assets.star_icon : assets.star_dull_icon} alt=""/>
