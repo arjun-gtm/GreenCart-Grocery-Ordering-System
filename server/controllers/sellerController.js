@@ -16,9 +16,10 @@ export const sellerLogin = async (req, res) =>{
             const token = jwt.sign({ email, role: 'superadmin' }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
             res.cookie('sellerToken', token, {
-                httpOnly: true, 
+                httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+                domain: process.env.NODE_ENV === 'production' ? '.arjungtm.com.np' : undefined,
                 maxAge: 7 * 24 * 60 * 60 * 1000,
             });
 
@@ -32,9 +33,10 @@ export const sellerLogin = async (req, res) =>{
                 const token = jwt.sign({ email: admin.email, role: 'admin', id: admin._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
                 res.cookie('sellerToken', token, {
-                    httpOnly: true, 
+                    httpOnly: true,
                     secure: process.env.NODE_ENV === 'production',
                     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+                    domain: process.env.NODE_ENV === 'production' ? '.arjungtm.com.np' : undefined,
                     maxAge: 7 * 24 * 60 * 60 * 1000,
                 });
                 return res.json({ success: true, message: "Logged In as Admin", role: 'admin' });
@@ -147,6 +149,7 @@ export const sellerLogout = async (req, res)=>{
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            domain: process.env.NODE_ENV === 'production' ? '.arjungtm.com.np' : undefined,
         });
         return res.json({ success: true, message: "Logged Out" })
     } catch (error) {

@@ -15,16 +15,18 @@ import paymentRouter from "./routes/paymentRoute.js";
 const app = express();
 const port = process.env.PORT || 4000;
 
+app.set('trust proxy', 1);
+
 await connectDB();
 await connectCloudinary();
 
 
-const corsOptions = {
-  origin: process.env.FRONTEND_URL || true,
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "https://greencart.arjungtm.com.np",
+  "http://localhost:5173",
+  "http://localhost:5174",
+];
 
 app.use(
   cors({
