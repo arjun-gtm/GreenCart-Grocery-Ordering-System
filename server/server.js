@@ -19,12 +19,12 @@ await connectDB();
 await connectCloudinary();
 
 
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  "https://greencart.arjungtm.com.np",
-  "http://localhost:5173",
-  "http://localhost:5174",
-];
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || true,
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 app.use(
   cors({
