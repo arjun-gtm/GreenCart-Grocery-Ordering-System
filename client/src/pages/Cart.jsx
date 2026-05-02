@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
-import { assets, dummyAddress } from "../assets/assets";
+import { assets } from "../assets/assets";
 import toast from "react-hot-toast";
 
 const Cart = () => {
@@ -10,6 +10,10 @@ const Cart = () => {
     const [showAddress, setShowAddress] = useState(false)
     const [selectedAddress, setSelectedAddress] = useState(null)
     const [paymentOption, setPaymentOption] = useState("COD")
+    const subtotal = getCartAmount()
+    const tax = Math.floor((subtotal * 2) / 100 * 100) / 100
+    const total = subtotal + tax
+
     const getCart = ()=>{
         let tempArray = []
         for(const key in cartItems){
@@ -39,6 +43,10 @@ const Cart = () => {
 
     const placeOrder = async ()=>{
         try {
+            if(cartArray.length === 0){
+                return toast.error("Your cart is empty")
+            }
+
             if(!selectedAddress){
                 return toast.error("Please select an address")
             }
@@ -99,7 +107,7 @@ const Cart = () => {
         }
     },[user])
     
-    return products.length > 0 && cartItems ? (
+    return (
         <div className="flex flex-col md:flex-row mt-16">
             <div className='flex-1 max-w-4xl'>
                 <h1 className="text-3xl font-medium mb-6">
@@ -112,15 +120,22 @@ const Cart = () => {
                     <p className="text-center">Action</p>
                 </div>
 
-                {cartArray.map((product, index) => {
+                {cartArray.length === 0 ? (
+                    <div className="border border-gray-200 rounded p-8 text-center text-gray-500">
+                        <p className="text-lg font-medium text-gray-700">Your cart is empty</p>
+                        <p className="mt-2 text-sm">Add some products to see them here.</p>
+                    </div>
+                ) : cartArray.map((product) => {
                     const inStock = product.inStock !== false
+                    const image = Array.isArray(product.image) ? product.image[0] : product.image
+                    const category = product.category || "products"
                     return (
-                    <div key={index} className="grid grid-cols-[2fr_1fr_1fr] text-gray-500 items-center text-sm md:text-base font-medium pt-3">
+                    <div key={product._id} className="grid grid-cols-[2fr_1fr_1fr] text-gray-500 items-center text-sm md:text-base font-medium pt-3">
                         <div className="flex items-center md:gap-6 gap-3">
                             <div onClick={()=>{
-                                navigate(`/products/${product.category.toLowerCase()}/${product._id}`); scrollTo(0,0)
+                                navigate(`/products/${category.toLowerCase()}/${product._id}`); scrollTo(0,0)
                             }} className={`cursor-pointer w-24 h-24 flex items-center justify-center border rounded ${inStock ? "border-gray-300" : "border-amber-300 bg-amber-50/50"}`}>
-                                <img className={`max-w-full h-full object-cover ${!inStock ? "opacity-70 grayscale-[0.2]" : ""}`} src={product.image[0]} alt={product.name} />
+                                {image && <img className={`max-w-full h-full object-cover ${!inStock ? "opacity-70 grayscale-[0.2]" : ""}`} src={image} alt={product.name} />}
                             </div>
                             <div>
                                 <p className="hidden md:block font-semibold">{product.name}</p>
@@ -202,8 +217,8 @@ const Cart = () => {
                         </button>
                         {showAddress && (
                             <div className="absolute top-12 py-1 bg-white border border-gray-300 text-sm w-full">
-                               {addresses.map((address, index)=>(
-                                <p onClick={() => {setSelectedAddress(address); setShowAddress(false)}} className="text-gray-500 p-2 hover:bg-gray-100">
+                               {addresses.map((address)=>(
+                                <p key={address._id} onClick={() => {setSelectedAddress(address); setShowAddress(false)}} className="text-gray-500 p-2 hover:bg-gray-100">
                                     {address.street}, {address.city}, {address.state}, {address.country}
                                 </p>
                             )) }
@@ -226,26 +241,26 @@ const Cart = () => {
 
                 <div className="text-gray-500 mt-4 space-y-2">
                     <p className="flex justify-between">
-                        <span>Price</span><span>{currency}{getCartAmount()}</span>
+                        <span>Price</span><span>{currency}{subtotal}</span>
                     </p>
                     <p className="flex justify-between">
                         <span>Shipping Fee</span><span className="text-green-600">Free</span>
                     </p>
                     <p className="flex justify-between">
-                        <span>Tax (2%)</span><span>{currency}{getCartAmount() * 2 / 100}</span>
+                        <span>Tax (2%)</span><span>{currency}{tax}</span>
                     </p>
                     <p className="flex justify-between text-lg font-medium mt-3">
                         <span>Total Amount:</span><span>
-                            {currency}{getCartAmount() + getCartAmount() * 2 / 100}</span>
+                            {currency}{total}</span>
                     </p>
                 </div>
 
-                <button onClick={placeOrder} className="w-full py-3 mt-6 cursor-pointer bg-primary text-white font-medium hover:bg-primary-dull transition">
+                <button onClick={placeOrder} disabled={cartArray.length === 0} className={`w-full py-3 mt-6 font-medium transition ${cartArray.length === 0 ? "cursor-not-allowed bg-gray-300 text-gray-500" : "cursor-pointer bg-primary text-white hover:bg-primary-dull"}`}>
                     {paymentOption === "COD" ? "Place Order" : "Proceed to Checkout"}
                 </button>
             </div>
         </div>
-    ) : null
+    )
 }
 
 export default Cart;

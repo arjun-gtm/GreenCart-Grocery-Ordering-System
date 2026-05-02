@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { dummyProducts, categories as defaultCategories } from "../assets/assets";
+import { categories as defaultCategories } from "../assets/assets";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useUser, useAuth } from "@clerk/react";
@@ -84,7 +84,7 @@ export const AppContextProvider = ({children})=>{
                 setIsSeller(false)
                 setAdminRole(null)
             }
-        } catch (error) {
+        } catch {
             setIsSeller(false)
             setAdminRole(null)
         }
@@ -106,7 +106,7 @@ export const AppContextProvider = ({children})=>{
             }else{
                 setCategories(defaultCategories)
             }
-        } catch (error) {
+        } catch {
             setCategories(defaultCategories)
         }
     }
@@ -194,7 +194,7 @@ const getCartAmount = () =>{
     let totalAmount = 0;
     for (const items in cartItems){
         let itemInfo = products.find((product)=> product._id === items);
-        if(cartItems[items] > 0){
+        if(itemInfo && cartItems[items] > 0){
             totalAmount += itemInfo.offerPrice * cartItems[items]
         }
     }
